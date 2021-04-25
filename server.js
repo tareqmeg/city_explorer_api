@@ -1,12 +1,13 @@
 `use strict`;
 
 const express = require('express');
+require('dotenv').config();
 const server = express();
 
 
 const PORT = process.env.PORT || 3000;
 
-server.get('/data',(req,res)=>{
+server.get('/',(req,res)=>{
   res.status(200).send('Hi from the data page, I am the server !!!');
 });
 
