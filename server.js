@@ -22,14 +22,14 @@ server.get('/location',(req,res) =>{
 
 server.get('/weather',(req,res) =>{
   let weathData = require('./data/weather.json');
-  let newWarr =[];
-  weathData.data.forEach((item)=>{
+  let newAarr =[];
+  weathData.data.forEach(item =>{
     let wearherData = new Weather(item);
-    newWarr.push(wearherData);
+    newAarr.push(wearherData);
   });
 
 
-  res.send(newWarr);
+  res.send(newAarr);
 });
 
 function Location(locData){
@@ -38,12 +38,9 @@ function Location(locData){
   this.latitude = locData[0].lat;
   this.longitude = locData[0].lon;
 }
-function Weather(weathData){
-  this.forcast = weathData.weather.description;
-  this.time = weathData.valid_data;
-
-
-
+function Weather(weatherData){
+  this.forecast = weatherData.weather.description;
+  this.time = weatherData.valid_date;
 }
 
 
