@@ -8,8 +8,12 @@ const server = express();
 const PORT = process.env.PORT || 3000;
 server.use(cors());
 
-server.get('/',(req,res)=>{
-  res.status(200).send('Hi from the data page, I am the server !!!');
+server.get('*',(req,res)=>{
+  let errObj = {
+    status: 404,
+    resText: 'sorry! this page not found'
+  };
+  res.status(404).send(errObj);
 });
 
 server.get('/location',(req,res) =>{
