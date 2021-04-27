@@ -8,13 +8,7 @@ const server = express();
 const PORT = process.env.PORT || 3000;
 server.use(cors());
 
-server.get('*',(req,res)=>{
-  let errObj = {
-    status: 404,
-    resText: 'sorry! this page not found'
-  };
-  res.status(404).send(errObj);
-});
+
 
 server.get('/location',(req,res) =>{
   let locationData = require('./data/location.json');
@@ -35,7 +29,13 @@ server.get('/weather',(req,res) =>{
 
   res.send(newAarr);
 });
-
+server.get('*',(req,res)=>{
+  let errObj = {
+    status: 500,
+    resText: 'sorry! this page not found'
+  };
+  res.status(404).send(errObj);
+});
 function Location(locData){
   this.search_query = 'Lynnwood';
   this.formatted_query = locData[0].display_name;
