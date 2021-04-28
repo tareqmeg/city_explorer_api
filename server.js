@@ -29,7 +29,6 @@ function locationHandler(req,res){
   let sData =[cityName];
   client.query(SQL, sData).then(Data=>{
     if(Data.rows.search_query !== cityName){
-
       superagent.get(locURL).then(geoData=>{
         let gData = geoData.body;
         let locationData = new Location(cityName,gData);
@@ -44,16 +43,14 @@ function locationHandler(req,res){
           res.send(error);
         });
     }else{
-      res.send(Data.rows).catch(error=>{
-        console.log(error);
-        res.send(error);
-      });
+      res.send(Data.rows);
     }
 
   });
 
-
 }
+
+
 
 
 server.get('/weather', weathersHandler);
