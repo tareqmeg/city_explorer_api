@@ -9,7 +9,7 @@ const pg = require('pg');
 const server = express();
 const PORT = process.env.PORT || 3000;
 server.use(cors());
-const client = new pg.Client({connectionString: process.env.DATABASE_URL, ssl: {rejectUnauthorized: false}});
+const client = new pg.Client({connectionString: process.env.DATABASE_URL});
 
 
 server.get('/location', locationHandler);
