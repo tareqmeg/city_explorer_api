@@ -4,10 +4,12 @@ const express = require('express');
 require('dotenv').config();
 const cors = require('cors');
 const superagent = require('superagent');
+const pg = require('pg');
 
 const server = express();
 const PORT = process.env.PORT || 3000;
 server.use(cors());
+const client = new pg.Client(process.env.DATABASE_URL);
 
 
 server.get('/location', locationHandler);
@@ -23,17 +25,37 @@ function locationHandler(req,res){
   let LOCATION_KEY = process.env.GEOCODE_API_KEY;
   let locURL = `https://us1.locationiq.com/v1/search.php?key=${LOCATION_KEY}&q=${cityName}&format=json`;
 
-  superagent.get(locURL).then(geoData=>{
+  let SQL = `SELECT * FROM location_Data WHERE search_query=$1;`;
+  let sData =[cityName];
+  client.query(SQL, sData).then(Data=>{
+    if(Data.rows.search_query !== cityName){
 
-    let gData = geoData.body;
-    let locationData = new Location(cityName,gData);
-    res.send(locationData);
-  })
-    .catch(error=>{
-      console.log(error);
-      res.send(error);
-    });
+      superagent.get(locURL).then(geoData=>{
+        let gData = geoData.body;
+        let locationData = new Location(cityName,gData);
+        let SQL = `INSERT INTO location_Data (search_query, formatted_query, latitude, longitude) VALUES ($1,$2,$3,$4) RETURNING *;`;
+        let saveValues = [cityName, locationData.formatted_query, locationData.latitude, locationData.longitude];
+        client.query(SQL, saveValues).then(result=>{
+          res.send(result.rows);
+        });
+      })
+        .catch(error=>{
+          console.log(error);
+          res.send(error);
+        });
+    }else{
+      res.send(Data.rows).catch(error=>{
+        console.log(error);
+        res.send(error);
+      });
+    }
+
+  });
+
+
 }
+
+
 server.get('/weather', weathersHandler);
 function Weather(weatherData){
   this.forecast = weatherData.weather.description;
@@ -69,7 +91,9 @@ function generalHandler(req,res){
 
 
 
-
-server.listen(PORT,()=>{
-  console.log(`listening on port ${PORT}`);
+client.connect().then(()=>{
+  server.listen(PORT,()=>{
+    console.log(`listening on port ${PORT}`);
+  });
 });
+
