@@ -63,7 +63,6 @@ function weathersHandler (req,res){
   let WEATHER_KEY = process.env.WEATHER_KEY;
   let weatherURL = `https://api.weatherbit.io/v2.0/forecast/daily?city=${cityName}&key=${WEATHER_KEY}&days=8`;
   superagent.get(weatherURL).then(weatherData=>{
-    console.log(weatherData);
     let newAarr = weatherData.body.data.map((item) =>{
       let weatherObject =  new Weather(item);
       return weatherObject;
