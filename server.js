@@ -72,6 +72,59 @@ function weathersHandler (req,res){
 
 }
 
+server.get('/movies', moviesHandler);
+
+
+
+function Movies (moviesData){
+  this.title =moviesData.title;
+  this.overview=moviesData.overview;
+  this.average_votes=moviesData.vote_average;
+  this.total_votes=moviesData.total_votes;
+  this.image_url=`https://image.tmdb.org/t/p/w500${moviesData.poster_path}`;
+  this.popularity=moviesData.popularity;
+  this.released_on=moviesData.release_date;
+}
+function moviesHandler(req, res) {
+  let key = process.env.MOVIE_API_KEY;
+  let moviesURl = `https://api.themoviedb.org/3/trending/movie/day?api_key=${key}`;
+  superagent.get(moviesURl).then(getData => {
+    console.log(getData.body);
+    let newArr = getData.body.results.map(element => {
+
+      return new Movies(element);
+    });
+    res.send(newArr);
+
+  }
+  );
+}
+server.get('/yelp',(req,res)=>{
+  let YELP_API_Key= process.env.YELP_API_KEY;
+  let city_Name = req.query.search_query;
+  let page = req.query.page;
+  const dataPerpage =5;
+  const dataAmount = ((page -1)* dataPerpage + 1);
+  let yelpURL = `https://api.yelp.com/v3/businesses/search?location=${city_Name}&limit=${dataPerpage}&offset=${dataAmount}`;
+  superagent.get(yelpURL).set('Authorization' ,`Bearer ${YELP_API_Key}`).then(getData => {
+    console.log(getData.body.businesses);
+    let newArr = getData.body.businesses.map(element => {
+      return new Yelp(element);
+    });
+    res.send(newArr);
+
+  }
+  );
+
+});
+
+function Yelp (yelpData){
+  this.name =yelpData.name;
+  this.image_url=yelpData.image_url;
+  this.price=yelpData.price;
+  this.rating=yelpData.rating;
+  this.page=yelpData.pages;
+}
 
 
 server.get('/*', generalHandler);
