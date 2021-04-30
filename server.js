@@ -81,13 +81,13 @@ server.get('/parks', parkHAndler);
 function parkHAndler(req,res){
   let PARKS_API_KEY = process.env.PARKS_API_KEY;
   let cityName = req.query.search_query;
-  let parkURL = `https://developer.nps.gov/api/v1/parks?q=${cityName}&limit=10&api_key=${PARKS_API_KEY}`;
+  let parkURL = `https://developer.nps.gov/api/v1/parks?q=${cityName}&api_key=${PARKS_API_KEY}&limit=10`;
   superagent.get(parkURL).then(getData =>{
     console.lon(getData);
     let gettedData = getData.body.data;
     console.lon(gettedData);
     let parkData = gettedData.map((items)=>{
-      return new Park(items);
+      return new Park(cityName,items);
     });
     res.send(parkData);
   })
@@ -97,14 +97,17 @@ function parkHAndler(req,res){
 
 }
 
+
+
 function Park (cityName, parkData){
   this.cityName= cityName;
   this.name = parkData.fullName;
-  this.address = `${parkData.addresses[0].line1}, ${parkData.addresses[0].city} `;
+  this.address = `${parkData.addresses[0].line1}, ${parkData.addresses[0].city}, ${parkData.addresses[0].stateCode}, ${parkData.addresses[0].postalCode}`;
   this.fee = parkData.entranceFees[0].cost;
   this.description = parkData.description;
   this.url = parkData.url;
 }
+
 
 function Movies (moviesData){
   this.title =moviesData.title;
