@@ -9,8 +9,8 @@ const pg = require('pg');
 const server = express();
 const PORT = process.env.PORT || 3000;
 server.use(cors());
-const client = new pg.Client({connectionString: process.env.DATABASE_URL});
-
+// const client = new pg.Client({connectionString: process.env.DATABASE_URL}, );
+const client = new pg.Client( { connectionString: process.env.DATABASE_URL, ssl: process.env.LOCALLY ? false : {rejectUnauthorized: false}} );
 
 server.get('/location', locationHandler);
 function Location(cityName, locData){
